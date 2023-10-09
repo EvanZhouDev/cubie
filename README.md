@@ -96,7 +96,7 @@ Note that the stickers may move from the positive side of an axis to the negativ
 
 In order to mathematically represent this, I have created some simple transformation matrices that simply swap 2 components of a Vector. Let's call these $T$, for a general transformation.
 
-One further note before seeing the formulas below is that if we turn the side $90\degree\cdot(2n+1) \text{ for }n\in\N$ the Sticker Parity rule applies. However, for any multiple of $180\degree$, the same Sticker Parity before and after _will be the same_. Thus, we will need to keep track of how many $90\degree$ rotations we are applying (Referred to hereinafter as $\alpha$, not to be confused with $\theta$), and use modulo to detect if there is Sticker Parity.
+One further note before seeing the formulas below is that if we turn the side $90\degree\cdot(2n+1) \text{ for }n\in\mathbb{N}$ the Sticker Parity rule applies. However, for any multiple of $180\degree$, the same Sticker Parity before and after _will be the same_. Thus, we will need to keep track of how many $90\degree$ rotations we are applying (Referred to hereinafter as $\alpha$, not to be confused with $\theta$), and use modulo to detect if there is Sticker Parity.
 
 ```math
 T_x(\alpha) = \begin{bmatrix}
