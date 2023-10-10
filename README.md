@@ -5,9 +5,11 @@
   <img alt="Cubie Banner" src="./assets/banner@light.svg">
 </picture>
 
-(Probably) the world's smallest Rubik's cube simulator, powered by linear algebra.
+<p align="center">
+A tiny Rubik's cube simulator, powered by linear algebra.
+</p>
 
-Due to the heavily mathematical nature of this simulator, the notation may be slightly different than the Rubik's cube notation you may expect. Check out [cubekit](https://github.com/EvanZhouDev/cubekit) for a more user-friendly Rubik's cube library.
+> Due to the heavily mathematical nature of this simulator, the notation may be slightly different than the Rubik's cube notation you may expect. Check out [cubekit](https://github.com/EvanZhouDev/cubekit) for a more user-friendly Rubik's cube library.
 
 ## Usage
 
