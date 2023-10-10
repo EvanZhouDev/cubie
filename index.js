@@ -39,7 +39,7 @@ class Cube {
         for (const [p, [cx, cy, cz]] of this.pieces) {
             const [x, y, z] = p;
             flattened[String([x, 0, 0])][abs(y - 1)][abs(z - sign(x))] = abs(cx);
-            flattened[String([0, y, 0])][abs(z - sign(-y))][abs(x + 1)] = abs(cy);
+            flattened[String([0, y, 0])][abs(z + sign(y))][abs(x + 1)] = abs(cy);
             flattened[String([0, 0, z])][abs(y - sign(z))][abs(x + sign(z))] = abs(cz);
         }
 
