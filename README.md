@@ -331,13 +331,13 @@ Let's take an example of the x face. Through some simple visualization, we are a
 
 For sake of symmetry, I've added an absolute value to the `-x` plane calculation as well. Now, we can generalize everything in terms of x:
 
-$(|y-1|, |z-\operatorname{sign}()|)$
+$(|y-1|, |z-\text{sign}(x)|)$
 
 Now, just do this for all 3 axes, and it looks something like this:
 
 | x                                        | y                                        | z   |
 | ---------------------------------------- | ---------------------------------------- | --- |
-| $(\|y-1\|, \|z-\operatorname{sign}(x)\|)$ | $(\|z+\operatorname{sign}(y))\|, \|x+1\|)$ |  $(\|y-\operatorname{sign}(z))\|, \|x+\operatorname{sign}(z))\|)$  |
+| $(\|y-1\|, \|z-\text{sign}(x)\|)$ | $(\|z+\text{sign}(y))\|, \|x+1\|)$ |  $(\|y-\text{sign}(z))\|, \|x+\text{sign}(z))\|)$  |
 
 Now, just remember that we will need to assign the **absolute value** of the color vector to the plane.
 
