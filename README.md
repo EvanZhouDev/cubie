@@ -56,8 +56,8 @@ The position vector denotes the location of the piece on the cube. The "core" of
 
 ```math
 \mathbf{p} = \begin{bmatrix}
-x \\
-y \\
+x\\
+y\\
 z
 \end{bmatrix}, \quad \text{where } x, y, z \in \{-1, 0, 1\}
 ```
@@ -66,8 +66,8 @@ Next, I assigned each of the 6 colors on the Rubik's cube a number from $0$ to $
 
 ```math
 \mathbf{c} = \begin{bmatrix}
-c_x \\
-c_y \\
+c_x\\
+c_y\\
 c_z
 \end{bmatrix}, \quad \text{where } c_x, c_y, c_z \in \{0, 1, 2, 3, 4, 5\}
 ```
