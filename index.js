@@ -33,7 +33,7 @@ class Cube {
         }
     }
 
-    rotate(R) {
+    turn(R) {
         let [meta] = R;
         for (let piece of this.pieces) {
             let [pos] = piece;
