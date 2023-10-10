@@ -1,6 +1,39 @@
 # `cubie`
 
-(Probably) the world's smallest Rubik's cube simulator
+(Probably) the world's smallest Rubik's cube simulator, powered by linear algebra.
+
+Due to the heavily mathematical nature of this simulator, the notation may be slightly different than the Rubik's cube notation you may expect. Check out [cubekit](https://github.com/EvanZhouDev/cubekit) for a more user-friendly Rubik's cube library.
+
+## Usage
+
+All cube logic is stored in the `Cube` object.
+
+To get started, create a new instance:
+
+```javascript
+let myCube = new Cube();
+```
+
+### Rotating a Layer
+
+Next, nearly all turns can be defined with the following functions: `rx()`, `ry()`, and `rz()`. You will have to pass the result of this function into `Cube.turn()`.
+
+These functions all take 3 parameters: `rotations`, `layerStart`, and `layerEnd`. Depending on the axis you want to turn, choose one of the three functions.
+
+Then, determine how many 90° rotations you want to do, putting it into the first parameter.
+Next, select an interval of layers to turn. On each axis, the layers are -1, 0, and 1. For example, turning the +x layer by 90° will use a rotation function like this: `rx(1, 1)`. Notice how the `layerEnd` parameter can be skipped if the start and end are the same.
+
+Now, to actually mutate the `Cube`, do the following:
+
+```javascript
+myCube.turn(rx(1, 1));
+```
+
+### Seeing the Result
+
+In order to see that you have actually successfully turned a layer, you will need to use the `Cube.flatten()` method. This will return an object with keys in this format: `x,y,z`, where these values designate the side of the cube we are viewing.
+
+For example, `1,0,0` represents the +x side, `0,-1,0` the -y side, and so on. Each of these is assigned a Color number, in which the color for +x is 0, -x is 1, +y is 2, -y is 3, +z is 4, and finally, -z is 5.
 
 ## How it Works
 
@@ -142,7 +175,6 @@ Now, let's look at how I have organized this data structure in code.
 
 Let's get the logistics out of the way first.
 
-
 All "angles" from this point on will be referring to a multiple of $\frac{\pi}{2}$. I have defined `sin` and `cos`'s inputs to be multiplied by $\frac{\pi}{2}$, then have the output rounded to an integer (as rounding errors occur if they don't).
 
 Then, all matricies are flattened into an array to not make it too ugly. This means your rotation matrix will look like this:
@@ -158,7 +190,10 @@ A custom matrix-multiplication method is written to matrix-multiply these arrays
 All cube logic is contained in a class called `Cube`, and each Piece is an array (no point to make it an object) that looks like this:
 
 ```javascript
-[[px, py, pz], [cx, cy, cz]];
+[
+	[px, py, pz],
+	[cx, cy, cz],
+];
 ```
 
 And these Pieces are contained in a list in the `Cube` class.
@@ -173,19 +208,19 @@ It took a lot of iteration, but I eventually ended up with a function like this 
 
 ```javascript
 let rx = (T, x1 = 1, x2 = x1) => [
-    [0, x1, x2], // Metadata
-    [1, 0, 0, 0, cos(T), -sin(T), 0, sin(T), cos(T)], // Rx(alpha)
-    [1, 0, 0, 0, 1 - T % 2, T % 2, 0, T % 2, 1 - T % 2] // Tx(alpha)
+	[0, x1, x2], // Metadata
+	[1, 0, 0, 0, cos(T), -sin(T), 0, sin(T), cos(T)], // Rx(alpha)
+	[1, 0, 0, 0, 1 - (T % 2), T % 2, 0, T % 2, 1 - (T % 2)], // Tx(alpha)
 ];
 ```
 
-The metadata is stored such that the main `Rotate` method on `Cube` is aware of what it's doing. For now, focus on the second two lines. At index 1, we see the Rotation Matrix. At index 2, we see the Color transformation matrix. Whenever a piece needs to be rotated, it's Position Vector is multiplied by index 1, and Color Vector by index 2—and that's all it takes to transform a piece.
+The metadata is stored such that the main `turn` method on `Cube` is aware of what it's doing. For now, focus on the second two lines. At index 1, we see the Rotation Matrix. At index 2, we see the Color transformation matrix. Whenever a piece needs to be rotated, it's Position Vector is multiplied by index 1, and Color Vector by index 2—and that's all it takes to transform a piece.
 
 #### Putting it All Into a Cube
 
 Now, to make the cube class, we first initiate a total of 26 pieces ($3^3-1$) with correct positions and colors. As mentioned before, the colors are numbers, and as they are completely abstract, any simple mapping technique can work. This is how the Color Vector is defined in the code, with `x`, `y`, and `z` being the locations: `[x + 1, y + 4, z + 7]`.
 
-Now, to turn the cube, we have to use the `metadata` line of the rotation function we defined above:
+Now, to `turn` the cube, we have to use the `metadata` line of the rotation function we defined above:
 
 ```
 [axis, start, end]
