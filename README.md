@@ -11,6 +11,14 @@ A tiny Rubik's cube simulator, powered by linear algebra.
 
 > Due to the heavily mathematical nature of this simulator, the notation may be slightly different than the Rubik's cube notation you may expect. Check out [cubekit](https://github.com/EvanZhouDev/cubekit) for a more user-friendly Rubik's cube library.
 
+## Naming
+
+> ### **cu·bie**
+> *noun*
+> 1. One of the smaller [cubes](https://duckduckgo.com/?q=cubes+definition&ia=definition&atb=v368-1) making up a [Rubik's cube](https://duckduckgo.com/?q=Rubik%27s+cube+definition&ia=definition&atb=v368-1).
+
+Wanting to create a tiny and clean Rubik's cube simulator, it is only fitting that I took a cubing term that meant a smaller cube. A simple name that's just as nerdy as this project is 😅
+
 ## Usage
 
 All cube logic is stored in the `Cube` object.
@@ -273,7 +281,7 @@ In order to generate the colors, we take the position of the piece, and transfor
 [x, y, z].map((x, i) => (x + 1) / 2 + i * 2);
 ```
 
-As mentioned before, the colors are numbers, and they are completely abstract—up for the user to assign actual meaning to. However, this is the pattern: -x is 0, +x is 1, -y is 2, +y is 3, -z is 4, and finally, +z is 5.
+As mentioned before, the colors are numbers, and they are completely abstract—up for the user to assign actual meaning to. However, this is the pattern: `-x` is 0, `+x` is 1, `-y` is 2, `+y` is 3, `-z` is 4, and finally, `+z` is 5.
 
 ##### Doing a Turn:
 
@@ -283,7 +291,7 @@ Now, to `turn` the cube, we have to use the `metadata` line of the rotation func
 [axis, start, end]
 ```
 
-Iterate over all the pieces, finding all pieces whose component for the given axis (a number from 0 to 2, where 0 is x, 1 is y, and 2 is z) is between start and end, and apply the rotation matrix to both the color and position vectors (again, remember that applying the rotation matrix to the color vector will result in negatives, but that will be fixed in the flatten method, described below).
+Iterate over all the pieces, finding all pieces whose component for the given axis (a number from 0 to 2, where 0 is `x`, 1 is `y`, and 2 is `z`) is between `start` and `end`, and apply the rotation matrix to both the Color and Position Vectors (again, remember that applying the rotation matrix to the color vector will result in negatives, but that will be fixed in the flatten method, described below).
 
 The entire code looks like this (where `R` is our rotation matrix w/ metadata):
 
@@ -303,7 +311,7 @@ for (let i in this.pieces) {
 
 The final step is to turn the collection of pieces into a (somewhat) human-readable object.
 
-The direction of the flattening is shown in the diagram below, with the arrow pointing on the "up" direction on each face.
+The direction of the flattening is shown in the diagram below, with the arrow pointing on the "up" direction (top of the 2D array) on each face.
 
 ```
     +---+
@@ -319,15 +327,15 @@ Each face is identified with one of these strings: `["1,0,0", "-1,0,0", "0,1,0",
 
 These strings are coordinate pairs identifying the face axis and whether its positive or negative.
 
-For example, `"1,0,0"` represents the +x face, `"0,-1,0"` represents the -y face, and so on.
+For example, `"1,0,0"` represents the `+x` face, `"0,-1,0"` represents the `-y` face, and so on.
 
 Flattening the cube is done through some projection mathematics. Essentially, for every face, two numbers are calculated for the corresponding `i` and `j` coordinates for that face.
 
-Let's take an example of the x face. Through some simple visualization, we are able to see that in order to project a piece's x-face color onto the -x plane, the coordinate on the **-x plane** is $(2 - (y+1), z + 1)$. To project the piece's x-face color onto the +x plane, the coordinate on the **+x plane** is $(2 - (y+1), 2 - (z+1))$. Let us simplify these two with absolute values.
+Let's take an example of the x face. Through some simple visualization, we are able to see that in order to project a piece's x-face color onto the `-x` plane, the coordinate on the **-x plane** is $(2 - (y+1), z + 1)$. To project the piece's x-face color onto the `+x` plane, the coordinate on the **+x plane** is $(2 - (y+1), 2 - (z+1))$. Let us simplify these two with absolute values.
 
--x: $(|y-1|, |z+1|)$
+`-x`: $(|y-1|, |z+1|)$
 
-+x: $(|y-1|, |z-1|)$
+`+x`: $(|y-1|, |z-1|)$
 
 For sake of symmetry, I've added an absolute value to the `-x` plane calculation as well. Now, we can generalize everything in terms of x:
 
@@ -335,7 +343,7 @@ $(|y-1|, |z-\text{sign}(x)|)$
 
 Now, just do this for all 3 axes, and it looks something like this:
 
-| x                                        | y                                        | z   |
+| `x`                                        | `y`                                        | `z`   |
 | ---------------------------------------- | ---------------------------------------- | --- |
 | $(\|y-1\|, \|z-\text{sign}(x)\|)$ | $(\|z+\text{sign}(y))\|, \|x+1\|)$ |  $(\|y-\text{sign}(z))\|, \|x+\text{sign}(z))\|)$  |
 
