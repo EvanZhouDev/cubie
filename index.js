@@ -1,7 +1,6 @@
 let normalize = (f, a) => Math.round(f(0.5 * a * Math.PI));
 let sin = (a) => normalize(Math.sin, a), cos = (a) => normalize(Math.cos, a), { abs, sign } = Math;
 
-let newSquare2d = (n) => Array.from(Array(n), () => new Array(n));
 let rx = (T, x1 = 1, x2 = x1) => [
     [0, x1, x2],
     [1, 0, 0, 0, cos(T), -sin(T), 0, sin(T), cos(T)],
@@ -62,3 +61,5 @@ class Cube {
         return flattened;
     }
 }
+
+export default { rx, ry, rz, Cube };

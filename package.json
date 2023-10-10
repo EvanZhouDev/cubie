@@ -1,0 +1,20 @@
+{
+  "name": "cubie",
+  "version": "1.0.0",
+  "description": "A tiny Rubik's cube simulator.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EvanZhouDev/cubie.git"
+  },
+  "author": "EvanZhouDev",
+  "license": "GPL-3.0",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/EvanZhouDev/cubie/issues"
+  },
+  "homepage": "https://github.com/EvanZhouDev/cubie#readme"
+}
