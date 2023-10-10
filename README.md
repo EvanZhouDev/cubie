@@ -1,4 +1,9 @@
-# `cubie`
+<picture>
+
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/banner@dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="./assets/banner@light.svg">
+  <img alt="Cubie Banner" src="./assets/banner@light.svg">
+</picture>
 
 (Probably) the world's smallest Rubik's cube simulator, powered by linear algebra.
 
@@ -33,7 +38,7 @@ myCube.turn(rx(1, 1));
 
 In order to see that you have actually successfully turned a layer, you will need to use the `Cube.flatten()` method. This will return an object with keys in this format: `x,y,z`, where these values designate the side of the cube we are viewing.
 
-For example, `1,0,0` represents the +x side, `0,-1,0` the -y side, and so on. Each of these is assigned a Color number, in which the color for +x is 0, -x is 1, +y is 2, -y is 3, +z is 4, and finally, -z is 5.
+For example, `1,0,0` represents the +x side, `0,-1,0` the -y side, and so on. Each of these is assigned a Color number, in which the color for -x is 0, +x is 1, -y is 2, +y is 3, -z is 4, and finally, +z is 5.
 
 ## How it Works
 
@@ -169,6 +174,20 @@ z
 \end{bmatrix}
 ```
 
+However, there's one more tricky thing that you may notice (I sure didn't on the first time I implemented it!). Let's first rewrite these modulos in terms of $\sin$ and $\cos$. I'll show the one for $T_x$ for demo:
+
+```math
+T_x(\alpha) = \begin{bmatrix}
+1 & 0 & 0\\
+0 & |\cos(\alpha)| & |\sin(\alpha)|\\
+0 & |\sin(\alpha)| & |\cos(\alpha)|
+\end{bmatrix}
+```
+
+Notice how this is extremely similar to our rotation matricies. In fact, other than the absolute values, they are _exactly the same_!
+
+So, instead of using two different transformation matrices, we will only be using one—our rotation matricies we defined above. Then, when presenting the values to the user, we will just need to ensure that the values are positive.
+
 Now, let's look at how I have organized this data structure in code.
 
 ### The Cube
@@ -202,23 +221,59 @@ Now, for the fun part...
 
 #### Defining a Overarching Rotation Function
 
-To make this clean and simple, I wanted a 3 rotation functions (in 3 axes) that took the **angle of rotation**, and **number of layers**, and returned a single, clean, **matrix** (used loosely here, more like an array) that can somehow be interpreted by a **single rotating function** to rotate a piece.
+To make this clean and simple, I wanted a 3 rotation functions, one for each axis, that looked something like this:
 
-It took a lot of iteration, but I eventually ended up with a function like this (example for the x-axis):
+| Input A                       | Input B          | Output                 |
+| ----------------------------- | ---------------- | ---------------------- |
+| Angle to Rotate (in $\alpha$) | Layers to Rotate | A Single Array of Data |
+
+The reason I wanted this is so that I could rotate a layer by calling the `turn` method on `Cube` with one argument, that would dictate an entire turn.
+
+For example, rotating the +x layer by 90° could look like this:
+
+```js
+let myCube = new Cube();
+myCube.turn(rx(1, 1));
+```
+
+This is much cleaner and mathematically efficient than having a different turn function for "R", "U", "L", etc.
+
+It took a lot of iteration, but I eventually ended up with the following format for a rotation function:
 
 ```javascript
-let rx = (T, x1 = 1, x2 = x1) => [
-	[0, x1, x2], // Metadata
-	[1, 0, 0, 0, cos(T), -sin(T), 0, sin(T), cos(T)], // Rx(alpha)
-	[1, 0, 0, 0, 1 - (T % 2), T % 2, 0, T % 2, 1 - (T % 2)], // Tx(alpha)
+let rx = (alpha, x1 = 1, x2 = x1) => [
+	1,
+	0,
+	0,
+	0,
+	cos(alpha),
+	-sin(alpha),
+	0,
+	sin(alpha),
+	cos(alpha),
+	0,
+	x1,
+	x2,
 ];
 ```
 
-The metadata is stored such that the main `turn` method on `Cube` is aware of what it's doing. For now, focus on the second two lines. At index 1, we see the Rotation Matrix. At index 2, we see the Color transformation matrix. Whenever a piece needs to be rotated, it's Position Vector is multiplied by index 1, and Color Vector by index 2—and that's all it takes to transform a piece.
+Note the format of this. The first 9 elements of the array is my 3x3 rotation matrix. The last 3 elements of the array are the metadata, which tells the `Cube.turn` method which axis it is turning on, and which layers to turn.
+
+Remember that "custom matrix-multiplication method" mentioned above? Well, it only uses the first 9 elements of the array, so the remaining elements can be read harmlessly.
 
 #### Putting it All Into a Cube
 
-Now, to make the cube class, we first initiate a total of 26 pieces ($3^3-1$) with correct positions and colors. As mentioned before, the colors are numbers, and as they are completely abstract, any simple mapping technique can work. This is how the Color Vector is defined in the code, with `x`, `y`, and `z` being the locations: `[x + 1, y + 4, z + 7]`.
+Now, to make the cube class, we first initiate a total of 26 pieces ($3^3-1$) with correct positions and colors.
+
+In order to generate the colors, we take the position of the piece, and transform each component a little bit to turn each component into a unique color. As `x`, `y`, and `z` are either -1 or 1 (or 0, but we do not need to worry about those colors), we do `(component + 1) / 2` to compress it into a 0 or a 1. Then, offset each axis by 2. The code looks something like this:
+
+```js
+[x, y, z].map((x, i) => (x + 1) / 2 + i * 2);
+```
+
+As mentioned before, the colors are numbers, and they are completely abstract—up for the user to assign actual meaning to. However, this is the pattern: -x is 0, +x is 1, -y is 2, +y is 3, -z is 4, and finally, +z is 5.
+
+##### Doing a Turn:
 
 Now, to `turn` the cube, we have to use the `metadata` line of the rotation function we defined above:
 
@@ -226,10 +281,85 @@ Now, to `turn` the cube, we have to use the `metadata` line of the rotation func
 [axis, start, end]
 ```
 
-We look at all pieces whose location on the given axis (0 is `x`, 1 is `y`, 2 is `z`) is between the `start` and `end` values. Then, we apply the rotation to that piece as shown above. That's it! (See how the math pays off?)
+Iterate over all the pieces, finding all pieces whose component for the given axis (a number from 0 to 2, where 0 is x, 1 is y, and 2 is z) is between start and end, and apply the rotation matrix to both the color and position vectors (again, remember that applying the rotation matrix to the color vector will result in negatives, but that will be fixed in the flatten method, described below).
+
+The entire code looks like this (where `R` is our rotation matrix w/ metadata):
+
+```js
+const [axis, start, end] = R.slice(9);
+
+for (let i in this.pieces) {
+	const piece = this.pieces[i],
+		pos = piece[0][axis];
+	if (pos >= start && pos <= end) {
+		this.pieces[i] = piece.map((x) => mult(R, x));
+	}
+}
+```
 
 #### Flattening the Cube
 
-The final step is to turn the collection of pieces into a (somewhat) human-readable object. Each face is identified with one of these strings: `["1,0,0", "-1,0,0", "0,1,0", "0,-1,0", "0,0,1", "0,0,-1"]` (a coordinate pair identifying the face axis and whether its top/bottom, left/right, or front/back—technically, the axis are all abstract, so you define what is what). Then, iterating through each face and applying a flattening transformation I won't get into too much detail in here, it is able to transform each side into a 3x3 matrix.
+The final step is to turn the collection of pieces into a (somewhat) human-readable object.
 
-And that's how `cubie` works!
+The direction of the flattening is shown in the diagram below, with the arrow pointing on the "up" direction on each face.
+
+```
+    +---+
+    |^+y|
++---+---+---+---+
+|^-x|^+z|^+x|^-z|
++---+---+---+---+
+    |^-y|
+    +---+
+```
+
+Each face is identified with one of these strings: `["1,0,0", "-1,0,0", "0,1,0", "0,-1,0", "0,0,1", "0,0,-1"]`
+
+These strings are coordinate pairs identifying the face axis and whether its positive or negative.
+
+For example, `"1,0,0"` represents the +x face, `"0,-1,0"` represents the -y face, and so on.
+
+Flattening the cube is done through some projection mathematics. Essentially, for every face, two numbers are calculated for the corresponding `i` and `j` coordinates for that face.
+
+Let's take an example of the x face. Through some simple visualization, we are able to see that in order to project a piece's x-face color onto the -x plane, the coordinate on the **-x plane** is $(2 - (y+1), z + 1)$. To project the piece's x-face color onto the +x plane, the coordinate on the **+x plane** is $(2 - (y+1), 2 - (z+1))$. Let us simplify these two with absolute values.
+
+-x: $(|y-1|, |z+1|)$
+
++x: $(|y-1|, |z-1|)$
+
+For sake of symmetry, I've added an absolute value to the `-x` plane calculation as well. Now, we can generalize everything in terms of x:
+
+$(|y-1|, |z-\operatorname{sign}()|)$
+
+Now, just do this for all 3 axes, and it looks something like this:
+
+| x                                        | y                                        | z   |
+| ---------------------------------------- | ---------------------------------------- | --- |
+| $(\|y-1\|, \|z-\operatorname{sign}(x)\|)$ | $(\|z+\operatorname{sign}(y))\|, \|x+1\|)$ |  $(\|y-\operatorname{sign}(z))\|, \|x+\operatorname{sign}(z))\|)$  |
+
+Now, just remember that we will need to assign the **absolute value** of the color vector to the plane.
+
+Finally, putting it all together, let's implement it in code.
+
+One thing that we have to note is that some pieces are not projected onto any plane. Upon visual inspection, pieces that are not projected onto face $n$ have a 0 in component $n$. Now, the trick is to create a result object with a key `"0,0,0"`, that will get assigned randomly all of these non-existent (one may say "imaginary") stickers. Then, we delete this at the end.
+
+The final function looks like this:
+
+```js
+flatten() {
+        const flattened = ["1,0,0", "-1,0,0", "0,1,0", "0,-1,0", "0,0,1", "0,0,-1", "0,0,0"]
+            .reduce((acc, piece) => ({ ...acc, [piece]: Array(3).fill().map(_ => Array(3)) }), {});
+
+        for (const [p, [cx, cy, cz]] of this.pieces) {
+            const [x, y, z] = p;
+            flattened[String([x, 0, 0])][abs(y - 1)][abs(z - sign(x))] = abs(cx);
+            flattened[String([0, y, 0])][abs(z + sign(y))][abs(x + 1)] = abs(cy);
+            flattened[String([0, 0, z])][abs(y - sign(z))][abs(x + sign(z))] = abs(cz);
+        }
+
+        delete flattened[String([0, 0, 0])]
+        return flattened;
+    }
+```
+
+And that's all!
