@@ -36,7 +36,7 @@ Next, nearly all turns can be defined with the following functions: `rx()`, `ry(
 These functions all take 3 parameters: `rotations`, `layerStart`, and `layerEnd`. Depending on the axis you want to turn, choose one of the three functions.
 
 Then, determine how many 90° rotations you want to do, putting it into the first parameter.
-Next, select an interval of layers to turn. On each axis, the layers are -1, 0, and 1. For example, turning the +x layer by 90° will use a rotation function like this: `rx(1, 1)`. Notice how the `layerEnd` parameter can be skipped if the start and end are the same.
+Next, select an interval of layers to turn. On each axis, the layers are -1, 0, and 1. For example, turning the `+x` layer by 90° will use a rotation function like this: `rx(1, 1)`. Notice how the `layerEnd` parameter can be skipped if the start and end are the same.
 
 Now, to actually mutate the `Cube`, do the following:
 
@@ -48,7 +48,7 @@ myCube.turn(rx(1, 1));
 
 In order to see that you have actually successfully turned a layer, you will need to use the `Cube.flatten()` method. This will return an object with keys in this format: `x,y,z`, where these values designate the side of the cube we are viewing.
 
-For example, `1,0,0` represents the +x side, `0,-1,0` the -y side, and so on. Each of these is assigned a Color number, in which the color for -x is 0, +x is 1, -y is 2, +y is 3, -z is 4, and finally, +z is 5.
+For example, `"1,0,0"` represents the `+x` side, `"0,-1,0"` the `-y` side, and so on. Each of these is assigned a Color number, in which the color for `-x` is 0, `+x` is 1, `-y` is 2, `+y` is 3, `-z` is 4, and finally, `+z` is 5.
 
 ## How it Works
 
@@ -70,7 +70,7 @@ z
 \end{bmatrix}, \quad \text{where } x, y, z \in \{-1, 0, 1\}
 ```
 
-Next, I assigned each of the 6 colors on the Rubik's cube a number from $0$ to $5$.
+Next, I assigned each of the 6 colors on the Rubik's cube a number from $0$ to $5$, in which the color for `-x` is 0, `+x` is 1, `-y` is 2, `+y` is 3, `-z` is 4, and finally, `+z` is 5.
 
 ```math
 \mathbf{c} = \begin{bmatrix}
